@@ -40,36 +40,12 @@ export const getBookById = catchAsync(async (req, res, next) => {
   });
 });
 
-export const UpdateBook = catchAsync(async (req, res, next) => {
+export const updateBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { title, author, description, type, genreId, stock, year, category, coverPath } = req.body;
 
-  const bookExist = await prisma.book.findUnique({
-    where: { id, },
-  });
 
-  if (!bookExist) {
-    return next(new AppError("Buku tidak ditemukan", 404));
-  }
-
-  const dataToUpdate = {
-    title,
-    author,
-    description,
-    type,
-    genreId,
-    stock : category === 'DIGITAL' ? 0 : stock,
-    yearOfRelease: year,
-  };
-
-  if (coverPath) {
-    dataToUpdate.cover = coverPath;
-  }
-
-  const updatedBook = await prisma.book.update({
-    where: { id, },
-    data: dataToUpdate,
-  });
+  const updatedBook = await bookService.updateBookLogic(title, author, description, type, genreId, stock, year, category, coverPath)
 
   res.status(200).json({
     status: "success",
@@ -81,16 +57,7 @@ export const UpdateBook = catchAsync(async (req, res, next) => {
 export const deleteBook = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  const book = await prisma.book.findUnique({
-    where: { id, },
-  });
-  if (!book) {
-    return next(new AppError(`Buku dengan id ${id}, tidak ditemukan`, 404));
-  }
-
-  const delBook = await prisma.book.delete({
-    where: { id, },
-  });
+  const delBook = await bookService.deleteBookLogic(id)
   res.status(200).json({
     status: "success",
     message: `Berhasil menghapus data buku dengan id ${id}`,
