@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@plugin "daisyui";
+
+.content-fixed {
+  position: fixed;
+  top: 64px;
+  left: 0;          
+  right: 0;
+  bottom: 0;
+  background: white;
+  overflow-y: auto;
+  z-index: 40;
+  padding: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .content-fixed {
+    left: 15rem;
+  }
+}
+
+.content-fixed .page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+:root{
+  --brand-500: #6d28d9;
+  --brand-600: #5b21b6;
+  --muted: #6b7280;
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+/* helper kecil */
+.card { @apply bg-white rounded-2xl shadow-sm p-6; }
+.btn-brand { @apply bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700; }
+.input { @apply w-full px-4 py-3 border border-gray-200 rounded-lg bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500; }
+.error-box { @apply p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg; }
+
+/* sidebar / navbar small helpers */
+aside { @apply min-h-screen; }
+header { @apply sticky top-0 z-10; }

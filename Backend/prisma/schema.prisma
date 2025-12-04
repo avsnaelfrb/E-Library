@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  nim          String    @unique
+  password     String
+  role         Role      @default(USER)
+  photoProfile String  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  borrows      Borrow[]
+  readLogs     ReadLog[]
+}
+
+model Book {
+  id           Int       @id @default(autoincrement())
+  title        String
+  author       String
+  description  String?
+  cover        String?
+  type         BookType  
+  genreId      Int
+  stock        Int       @default(1)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  yearOfRelease Int
+
+  category     BookCategory @default(PHYSICAL)
+  fileUrl      String?
+  fileSize     Int?
+
+  genre        Genre     @relation(fields: [genreId], references: [id])
+  borrows      Borrow[]
+  readLogs     ReadLog[]
+}
+
+model Genre {
+  id       Int     @id @default(autoincrement())
+  name     String  @unique
+  books    Book[]
+}
+
+model Borrow {
+  id           Int       @id @default(autoincrement())
+  userId       Int
+  bookId       Int
+  borrowDate   DateTime  @default(now())
+  returnDate   DateTime?
+  dueDate      DateTime
+  status       BorrowStatus @default(BORROWED)
+
+  user         User      @relation(fields: [userId], references: [id])
+  book         Book      @relation(fields: [bookId], references: [id])
+}
+
+model ReadLog {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  bookId     Int
+  readAt     DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id])
+  book       Book      @relation(fields: [bookId], references: [id])
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum BookType {
+  BOOK
+  JOURNAL
+  ARTICLE
+}
+
+enum BorrowStatus {
+  BORROWED
+  RETURNED
+  LATE
+  REQUESTED
+}
+
+enum BookCategory {
+  PHYSICAL
+  DIGITAL
+}
+

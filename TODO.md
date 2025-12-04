@@ -1,0 +1,3 @@
+- [x] Fix editPhotoProfile function in userController.js: Change data assignment to use string path instead of object
+- [x] Add route for editPhotoProfile in userRoute.js with multer middleware and validation
+- [ ] Test the function to ensure it works correctly
