@@ -1,32 +1,13 @@
 import prisma from "../config/prismaConfig.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
+import * as bookService from "../service/bookService.js"
 
 export const createBook = catchAsync(async (req, res, next) => {
   const { title, author, description, type, genreId, stock, year, category, coverPath, bookFilePath, bookFileSize } =
     req.body;
   
-  if (category === 'DIGITAL' && !bookFilePath){
-    return next(new AppError('Buku digital wajib menyertakan file PDF!', 400))
-  }
-
-  const finalStock = category === 'PHYSICAL' ? (stock ? parseInt(stock) : 1) : 0; 
-
-  const newBook = await prisma.book.create({
-    data: {
-      title,
-      author,
-      description,
-      cover: coverPath,
-      fileUrl: bookFilePath,
-      fileSize: bookFileSize ? parseInt(bookFileSize) : null,
-      type,
-      yearOfRelease: year,
-      genreId: genreId,
-      stock: finalStock,
-      category: category,
-    },
-  });
+  const newBook = await bookService.createBookLogic(title, author, description, type, genreId, stock, year, category, coverPath, bookFilePath, bookFileSize)
 
   res.status(201).json({
     status: "success",
@@ -38,26 +19,7 @@ export const createBook = catchAsync(async (req, res, next) => {
 export const getAllBook = catchAsync(async (req, res, next) => {
   const { genreId, type, search } = req.query;
 
-  let filters = {};
-
-  if (genreId) {
-    filters.genreId = genreId;
-  }
-  if (type) {
-    filters.type = type;
-  }
-  if (search) {
-    filters.OR = [
-      { title: { contains: search } },
-      { author: { contains: search } },
-      { description: { contains: search } },
-    ];
-  }
-  const books = await prisma.book.findMany({
-    where: filters,
-    include: { genre: true },
-    orderBy: { createdAt: "desc" },
-  });
+  const books = await bookService.getAllBookLogic(genreId, type, search)
 
   res.status(200).json({
     status: "success",
@@ -68,13 +30,8 @@ export const getAllBook = catchAsync(async (req, res, next) => {
 
 export const getBookById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const book = await prisma.book.findUnique({
-    where: { id },
-  });
-
-  if (!book) {
-    return next(new AppError(`Buku dengan ${id} tidak ditemukan`, 404));
-  }
+  
+  const book = await bookService.getBookById(id)
 
   res.status(200).json({
     status: "success",
