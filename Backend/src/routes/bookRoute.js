@@ -5,7 +5,7 @@ import {
   deleteBook,
   getAllBook,
   getBookById,
-  UpdateBook,
+  updateBook,
 } from "../controllers/bookController.js";
 
 import { verifyToken, isAdmin } from "../middleware/middleware.js";
@@ -60,7 +60,7 @@ route.put(
   updateRule,
   upload.single("cover"),
   validate,
-  UpdateBook
+  updateBook
 );
 
 //DELETE Book
