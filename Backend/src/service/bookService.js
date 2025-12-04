@@ -60,3 +60,45 @@ export const getBookById = async (id) => {
         throw new AppError(`Buku dengan id ${id} tidak ditemukan`, 404)
     }
 }
+
+export const updateBookLogic = async(id, title, author, description, type, genreId, stock, year, category, coverPath) => {
+    const bookExist = await prisma.book.findUnique({
+        where: {id}
+    })
+    if (!bookExist) {
+        throw new AppError(`Buku tidak dengan id ${id} tidak ditemukan`, 404);   
+    }
+
+    const dataToUpdate = {
+        title,
+        author,
+        description,
+        type,
+        genreId,
+        stock : category === 'DIGITAL' ? 0 : stock,
+        yearOfRelease: year,
+    }
+
+    if (coverPath) {
+        dataToUpdate.cover = coverPath
+    }
+
+    return await prisma.book.update({
+        where: { id },
+        data: dataToUpdate
+    })   
+}
+
+export const deleteBookLogic = async (id) => {
+    const book = await prisma.book.findUnique({
+        where: {id}
+    })
+
+    if (!book) {
+        throw new AppError(`Buku dengan id ${id} tidak dapat ditemukan`, 404)
+    }
+
+    return await prisma.book.delete({
+        where: {id}
+    })
+}
