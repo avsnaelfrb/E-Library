@@ -1,21 +1,12 @@
 import prisma from "../config/prismaConfig.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
+import * as genreService from "../service/genreService.js"
 
 export const createGenre = catchAsync(async (req, res, next) => {
   const { name } = req.body;
 
-  const existGenre = await prisma.genre.findUnique({
-    where: { name },
-  });
-
-  if (existGenre) {
-    return next(new AppError("Genre sudah ada", 400));
-  }
-
-  const newGenre = await prisma.genre.create({
-    data: { name },
-  });
+  const newGenre = await genreService.createGenreLogic(name)
 
   res.status(201).json({
     status: "success",
@@ -25,31 +16,19 @@ export const createGenre = catchAsync(async (req, res, next) => {
 });
 
 export const getAll = catchAsync(async (req, res, next) => {
-  const getAll = await prisma.genre.findMany({
-    include: { books: true },
-    orderBy: { name: "asc" },
-  });
+  const getAll = await genreService.getAllGenreLogic()
 
   res.status(200).json({
     status: "success",
     message: "Berhasil mengambil semua genre",
-    data: getAll,
+    data: getAll
   });
 });
 
 export const getById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
 
-  const genreId = await prisma.genre.findUnique({
-    where: { id },
-    include: { books: true },
-  });
-
-  if (!genreId) {
-    return next(
-      new AppError(`Tidak dapat menemukan genre dengan id ${id}`, 404)
-    );
-  }
+  const genreId = await genreService.getByIdLogic(id)
 
   res.status(200).json({
     status: "success",
