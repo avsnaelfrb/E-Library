@@ -1,6 +1,4 @@
-import prisma from "../config/prismaConfig.js";
 import catchAsync from "../utils/catchAsync.js";
-import AppError from "../utils/appError.js";
 import * as bookService from "../service/bookService.js"
 
 export const createBook = catchAsync(async (req, res, next) => {
