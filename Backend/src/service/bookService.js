@@ -2,6 +2,14 @@ import prisma from "../config/prismaConfig.js";
 import AppError from "../utils/appError.js";
 
 export const createBookLogic = async (title, author, description, type, genreId, stock, year, category, coverPath, bookFilePath, bookFileSize) => {
+    const idGenre = await prisma.genre.findUnique({
+        where: { id: genreId }
+    })
+
+    if (!idGenre) {
+        throw new AppError(`Tidak ada genre dengan id ${genreId}`, 404)
+    }
+
     if (category === 'DIGITAL' && !bookFilePath) {
         throw new AppError('Buku digital harus menyertakan file PDF', 400)
     }
@@ -59,6 +67,8 @@ export const getBookById = async (id) => {
     if (!book) {
         throw new AppError(`Buku dengan id ${id} tidak ditemukan`, 404)
     }
+
+    return book
 }
 
 export const updateBookLogic = async(id, title, author, description, type, genreId, stock, year, category, coverPath) => {
